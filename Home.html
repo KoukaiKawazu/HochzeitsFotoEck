@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Wedding Photo Booth</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- PASSWORD OVERLAY -->
+  <div id="password-overlay">
+    <form id="pw-form">
+      <h2>Passwort eingeben</h2>
+      <input type="password" id="pw-input" placeholder="Password" required />
+      <button type="submit">Log-In</button>
+    </form>
+  </div>
+<div>
+  <!-- MAIN APP -->
+  <div id="app" class="hidden">
+	<div id="snapshot-preview" class="hidden">
+		<div id="snapshot-overlay-icon"></div>
+		<img id="snapshot-img" /><br>
+			<button id="btn-upload-snap">Speichern</button><br>
+			<button id="btn-delete-snap">Löschen</button>
+	</div>
+    <div id="camera-container">
+      <!-- live camera feed -->
+      <video id="camera" autoplay playsinline></video>
+      <!-- flip camera -->
+      <button id="flip-button" aria-label="Flip Camera"></button>
+      <!-- snapshot preview -->
+      <canvas id="snapshot" class="hidden"></canvas>
+	</div>
+      <!-- buttons -->
+      <div id="controls">
+        <button id="btn-take">📷 Mach ein Foto! 📷</button>
+        <button id="btn-upload-file">Foto hochladen</button>
+      </div>
+      
+      <!-- hidden file-input -->
+      <input type="file" id="file-input" accept="image/*" multiple class="hidden">
+    </div>
+
+    <!-- LATEST IMAGES MARQUEE -->
+    <div id="marquee-container">
+      <div id="marquee"></div>
+    </div>
+  </div>
+
+  <script>
+    // --- PASSWORD PROTECTION ---
+    const overlay = document.getElementById('password-overlay');
+    const app = document.getElementById('app');
+    const PW_KEY = 'wedding_pw_ok';
+    const CORRECT_PW = 'test123'; // change this
+
+    function checkAuth() {
+      if (sessionStorage.getItem(PW_KEY) === '1') {
+        overlay.style.display = 'none';
+        app.classList.remove('hidden');
+        initCamera();
+        fetchLatestImages();
+      }
+    }
+    document.getElementById('pw-form').addEventListener('submit', e => {
+      e.preventDefault();
+      if (document.getElementById('pw-input').value === CORRECT_PW) {
+        sessionStorage.setItem(PW_KEY, '1');
+        checkAuth();
+      } else {
+        alert('Wrong password');
+      }
+    });
+    checkAuth();
+
+    // --- CAMERA SETUP ---
+    const video = document.getElementById('camera');
+    const canvas = document.getElementById('snapshot');
+    const btnTake = document.getElementById('btn-take');
+    const btnUploadFile = document.getElementById('btn-upload-file');
+    const fileInput = document.getElementById('file-input');
+    const controls = document.getElementById('controls');
+    const snapControls = document.getElementById('snapshot-controls');
+    const btnUploadSnap = document.getElementById('btn-upload-snap');
+    const btnDeleteSnap = document.getElementById('btn-delete-snap');
+    const flipBtn = document.getElementById('flip-button');
+
+    let stream;
+    let usingFront = false;
+
+    async function initCamera() {
+      if (stream) stream.getTracks().forEach(t => t.stop());
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: usingFront ? 'user' : 'environment' },
+          audio: false
+        });
+        video.srcObject = stream;
+      } catch (err) {
+        console.error(err);
+        alert('Cannot access camera');
+      }
+    }
+
+    // FLIP CAMERA BUTTON
+    flipBtn.addEventListener('click', () => {
+      usingFront = !usingFront;
+      initCamera();
+    });
+
+const snapshotPreview = document.getElementById('snapshot-preview');
+const snapshotImg = document.getElementById('snapshot-img');
+
+btnTake.addEventListener('click', () => {
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  canvas.getContext('2d').drawImage(video, 0, 0);
+
+  const dataURL = canvas.toDataURL('image/jpeg');
+  snapshotImg.src = dataURL;
+
+  snapshotImg.classList.remove('animate-in');
+  video.classList.add('hidden');
+  flipBtn.classList.add('hidden');
+  controls.classList.add('hidden');
+  snapshotPreview.classList.remove('hidden');
+
+  // Hide marquee
+  document.getElementById('marquee-container').classList.add('hidden');
+
+  requestAnimationFrame(() => {
+    snapshotImg.classList.add('animate-in');
+  });
+
+// DELETE SNAPSHOT
+btnDeleteSnap.addEventListener('click', () => {
+  snapshotPreview.classList.add('fade-out-left');
+  
+  // Wait for animation to end before hiding and showing things
+  snapshotPreview.addEventListener('animationend', () => {
+    snapshotPreview.classList.add('hidden');
+    snapshotPreview.classList.remove('fade-out-left');
+    
+    // Show video, flip button, controls, and marquee container with no initial delay
+    video.classList.remove('hidden');
+    flipBtn.classList.remove('hidden');
+    controls.classList.remove('hidden');
+    document.getElementById('marquee-container').classList.remove('hidden');
+    
+    // Apply fade-in animation immediately without delay
+    video.classList.add('fade-in2');
+    flipBtn.classList.add('fade-in2');
+    controls.classList.add('fade-in2');
+    document.getElementById('marquee-container').classList.add('fade-in2');
+  }, { once: true });
+
+  // Show ❌ overlay
+  showOverlayIcon('❌');
+});
+
+
+
+// UPLOAD SNAPSHOT
+btnUploadSnap.addEventListener('click', () => {
+  canvas.toBlob(blob => {
+    const form = new FormData();
+    form.append('photo', blob, 'snapshot.jpg');
+
+snapshotPreview.classList.add('fade-out-right');
+
+snapshotPreview.addEventListener('animationend', () => {
+  snapshotPreview.classList.add('hidden');
+  snapshotPreview.classList.remove('fade-out-right');
+  
+  // Show video, flip button, controls, and marquee container with no initial delay
+  video.classList.remove('hidden');
+  flipBtn.classList.remove('hidden');
+  controls.classList.remove('hidden');
+  document.getElementById('marquee-container').classList.remove('hidden');
+
+  // Apply fade-in animation immediately without delay
+  video.classList.add('fade-in2');
+  flipBtn.classList.add('fade-in2');
+  controls.classList.add('fade-in2');
+  document.getElementById('marquee-container').classList.add('fade-in2');
+}, { once: true });
+
+    // Show ✔️ overlay
+    showOverlayIcon('✔️');
+
+    fetch('/upload', { method: 'POST', body: form })
+      .then(fetchLatestImages)
+      .catch(console.error);
+  }, 'image/jpeg');
+});
+
+});
+
+function showOverlayIcon(symbol) {
+  const icon = document.getElementById('snapshot-overlay-icon');
+  icon.textContent = symbol;
+  icon.style.opacity = '1';
+
+  setTimeout(() => {
+    icon.style.opacity = '0';
+  }, 1200); // fades out after 1.2s
+}
+
+    // UPLOAD FROM FILES
+    btnUploadFile.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', () => {
+      const files = Array.from(fileInput.files);
+      Promise.all(files.map(file => {
+        const form = new FormData(); form.append('photo', file);
+        return fetch('/upload', { method: 'POST', body: form });
+      }))
+      .then(_ => { fileInput.value = ''; fetchLatestImages(); })
+      .catch(console.error);
+    });
+
+// --- MARQUEE OF LATEST IMAGES (TEST MODE) ---
+const marquee = document.getElementById('marquee');
+let fullView;
+
+function fetchLatestImages() {
+  // don’t show anything unless unlocked
+  if (sessionStorage.getItem('wedding_pw_ok') !== '1') {
+    marquee.innerHTML = '';
+    return;
+  }
+
+  // generate the 10 test URLs
+  const urls = Array.from({ length: 10 }, (_, i) => `test-photos/photo${i+1}.jpg`);
+
+  // duplicate them so the animation can loop seamlessly
+  const loopUrls = [...urls, ...urls];
+
+  marquee.innerHTML = '';
+  loopUrls.forEach(url => {
+    const img = document.createElement('img');
+    img.src = url;
+    img.loading = 'lazy';
+    img.addEventListener('click', () => toggleFullView(url));
+    marquee.appendChild(img);
+  });
+}
+
+
+function toggleFullView(src) {
+  // If already open, animate out then remove
+  if (fullView) {
+    fullView.classList.remove('visible');
+    fullView.addEventListener('transitionend', () => {
+      if (fullView) {
+        document.body.removeChild(fullView);
+        fullView = null;
+      }
+    }, { once: true });
+    return;
+  }
+
+  // Create & insert
+  fullView = document.createElement('div');
+  fullView.id = 'fullview';
+  fullView.addEventListener('click', () => toggleFullView());
+
+  const img = document.createElement('img');
+  img.src = src;
+  fullView.appendChild(img);
+  document.body.appendChild(fullView);
+
+  // allow next tick so the transition will run
+  requestAnimationFrame(() => {
+    fullView.classList.add('visible');
+  });
+}
+
+// call this on startup in place of your old fetchLatestImages()
+fetchLatestImages();
+
+  </script>
+</body>
+</html>

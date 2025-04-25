@@ -1,0 +1,340 @@
+/* RESET & UTILS */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+.hidden { display: none !important; }
+body, html {
+  width: 100%; height: 100%;
+  font-family: sans-serif;
+  background: #fafafa;
+  overflow-x: hidden;
+}
+
+body {
+  /* path to your image file */
+  background-image: url('4.jpg');
+  
+  /* repeat it both horizontally and vertically */
+  background-repeat: repeat;
+  
+  /* leave at its natural size; omit or set to “auto” */
+  background-size: auto;
+  
+  /* optional: keep it fixed during scroll */
+  background-attachment: fixed;
+  
+  /* if your pattern has transparency, pick a base color */
+  background-color: #fafafa;
+}
+
+/* PASSWORD OVERLAY */
+#password-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center; justify-content: center;
+}
+#pw-form {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  text-align: center;
+}
+#pw-form input {
+  width: 100%;
+  padding: 0.75rem;
+  margin: 1rem 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+#pw-form button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  background: #007BFF;
+  color: white;
+  font-size: 1rem;
+}
+
+/* MAIN APP */
+#app { padding: 1rem; }
+
+/* CAMERA & CONTROLS */
+#camera-container {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto 1.5rem;
+
+}
+video, canvas {
+  width: 100%;
+  background: black;
+  border-color: black;
+  border: 2px solid #014325;
+  border-radius: 8px;
+}
+#controls {
+  width: 100%;             /* or whatever max-width you like */
+  max-width: 600px;
+  margin: 0.75rem auto;   /* vertically 0.75rem top, auto left/right */
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+#btn-take {
+  padding: 1rem;
+  font-size: 1.25rem;
+  width: 100%;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  background: #014325CC;
+  color: white;
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+  /* subtle shadow so inset on press looks nicer: */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.20);
+}
+
+#btn-take:active {
+  /* simulate button “give” under finger */
+  background: #014325;
+  transform: scale(0.97);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+#btn-upload-file {
+  padding: 0.75rem;
+  font-size: 1rem;
+  width: 80%;
+  margin: 0 auto;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  background: #989DA3CC;
+  color: white;
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+  /* subtle shadow so inset on press looks nicer: */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.20);
+}
+
+#btn-upload-file:active {
+  /* simulate button “give” under finger */
+  transform: scale(0.97);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+  background: #014325;
+}
+
+/* Snapshot overlay icon */
+#snapshot-overlay-icon {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18rem;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  pointer-events: none;
+  z-index: 1001;
+}
+
+/* Animation when uploading or deleting */
+.fade-out-right {
+  animation: slideOutRight 1s forwards ease-in-out;
+}
+
+.fade-out-left {
+  animation: slideOutLeft 1s forwards ease-in-out;
+}
+
+@keyframes slideOutRight {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(50%); opacity: 0; }
+}
+
+@keyframes slideOutLeft {
+  0% { transform: translateX(0); opacity: 1; }
+  100% { transform: translateX(-50%); opacity: 0; }
+}
+
+.fade-in {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.fade-in.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.fade-in2 {
+  animation: fadeIn2 0.5s ease-in-out;
+}
+
+@keyframes fadeIn2 {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+#snapshot-preview {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.0);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+#snapshot-preview img {
+  max-width: 120%;
+  max-height: 120%;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+  transition: transform 0.2s ease-out;
+}
+
+@keyframes zoomInFade {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+#snapshot-preview img.animate-in {
+  animation: zoomInFade 0.3s ease-out;
+}
+
+#btn-upload-snap {
+  padding: 1rem;
+  font-size: 1rem;
+  width: 50%;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  background: #014325CC;
+  color: white;
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+  /* subtle shadow so inset on press looks nicer: */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+#btn-upload-snap:active {
+  /* simulate button “give” under finger */
+  background: #014325;
+  transform: scale(0.97);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+#btn-delete-snap {
+  padding: 1rem;
+  font-size: 1rem;
+  width: 50%;
+  border: 2px solid #000000;
+  border-radius: 4px;
+  background: #b20000CC;
+  color: white;
+  transition: transform 0.1s ease-out, box-shadow 0.1s ease-out;
+  /* subtle shadow so inset on press looks nicer: */
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+#btn-delete-snap:active {
+  /* simulate button “give” under finger */
+  background: #b20000;
+  transform: scale(0.97);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+
+
+/* FILE INPUT */
+#file-input { display: none; }
+
+/* MARQUEE */
+#marquee-container {
+  /* existing… */
+  overflow: hidden;
+  white-space: nowrap;
+  border-top: 1px solid #ddd;
+  padding: 1rem 0;
+
+  /* new: counteract the #app padding and span viewport */
+  width: calc(100% + 2rem);
+  margin: 0 -1rem;
+  
+}#marquee {
+  display: inline-flex;
+  animation: scroll 60s linear infinite;
+}
+#marquee img {
+  /* bump from 80px up to 120px (or whatever you like) */
+  width: 260px;
+  height: 340px;
+	/*CFB53B*/
+  /* keep object-fit so they don’t distort */
+  object-fit: cover;
+
+  margin-right: 0.5rem;
+  border: 2px solid #014325;
+  border-radius: 4px;;
+  flex-shrink: 0;
+}
+
+@keyframes scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+#flip-button {
+  position: absolute;
+  bottom: 14px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 50px;
+  height: 50px;
+  background: rgba(255,255,255,0.15) url('flipimage.png') no-repeat center;
+  background-size: 60%; /* icon fills 60% of the circle */
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  
+}
+
+#flip-button:active {
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.3) url('flipimage.png') no-repeat center;
+  background-size: 80%;
+  transition: transform 1s;
+}
+
+/* FULLSCREEN VIEW */
+#fullview {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  /* start tiny and invisible */
+  transform: scale(0.8);
+  opacity: 0;
+
+  transition: transform 0.3s ease-out, opacity 0.3s ease-out;
+  z-index: 999;
+}
+
+/* visible state: full size & opaque */
+#fullview.visible {
+  transform: scale(1);
+  opacity: 1;
+}
+
+#fullview img {
+  max-width: 90%;
+  max-height: 90%;
+  border: 2px solid #014325;
+  border-radius: 8px;
+  /* optional drop-shadow */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  transition: transform 0.3s ease-out;
+}
