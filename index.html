@@ -55,14 +55,17 @@
     const PW_KEY = 'wedding_pw_ok';
     const CORRECT_PW = 'test123'; // change this
 
-    function checkAuth() {
-      if (sessionStorage.getItem(PW_KEY) === '1') {
-        overlay.style.display = 'none';
-        app.classList.remove('hidden');
-        initCamera();
-        fetchLatestImages();
-      }
-    }
+function checkAuth() {
+  // Make sure to check sessionStorage when the page loads
+  if (sessionStorage.getItem(PW_KEY) === '1') {
+    overlay.style.display = 'none';
+    app.classList.remove('hidden');
+    initCamera(); // Ensure the camera starts
+    fetchLatestImages(); // Ensure images are fetched and displayed
+  }
+}
+window.addEventListener('DOMContentLoaded', checkAuth);
+	  
     document.getElementById('pw-form').addEventListener('submit', e => {
       e.preventDefault();
       if (document.getElementById('pw-input').value === CORRECT_PW) {
@@ -89,19 +92,22 @@
     let stream;
     let usingFront = false;
 
-    async function initCamera() {
-      if (stream) stream.getTracks().forEach(t => t.stop());
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: usingFront ? 'user' : 'environment' },
-          audio: false
-        });
-        video.srcObject = stream;
-      } catch (err) {
-        console.error(err);
-        alert('Cannot access camera');
-      }
-    }
+async function initCamera() {
+  if (stream) stream.getTracks().forEach(t => t.stop()); // Stop previous streams if any
+  
+  try {
+    // Access the camera
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: usingFront ? 'user' : 'environment' },
+      audio: false
+    });
+    video.srcObject = stream; // Set the camera as the source for the video element
+    video.classList.remove('hidden'); // Show the camera video
+  } catch (err) {
+    console.error(err);
+    alert('Cannot access camera');
+  }
+}
 
     // FLIP CAMERA BUTTON
     flipBtn.addEventListener('click', () => {
@@ -224,19 +230,19 @@ const marquee = document.getElementById('marquee');
 let fullView;
 
 function fetchLatestImages() {
-  // don’t show anything unless unlocked
-  if (sessionStorage.getItem('wedding_pw_ok') !== '1') {
-    marquee.innerHTML = '';
+  // Don't show images unless the password is unlocked
+  if (sessionStorage.getItem(PW_KEY) !== '1') {
+    marquee.innerHTML = ''; // Clear any existing images
     return;
   }
 
-  // generate the 10 test URLs
+  // Fetch the image URLs (you can modify this to fetch from a real API later)
   const urls = Array.from({ length: 10 }, (_, i) => `test-photos/photo${i+1}.jpg`);
 
-  // duplicate them so the animation can loop seamlessly
+  // Duplicate the image URLs so the marquee can loop seamlessly
   const loopUrls = [...urls, ...urls];
 
-  marquee.innerHTML = '';
+  marquee.innerHTML = ''; // Clear the current images
   loopUrls.forEach(url => {
     const img = document.createElement('img');
     img.src = url;
