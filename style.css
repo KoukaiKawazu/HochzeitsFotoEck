@@ -249,7 +249,36 @@ video, canvas {
   box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
 }
 
+@media (max-width: 768px) {
+  #controls {
+    flex-direction: column;
+  }
+  #btn-take,
+  #btn-upload-file {
+    font-size: 1.2em;
+    margin: 10px;
+  }
+  
+  #camera-container {
+    flex-direction: column;
+    align-items: center;
+  }
 
+  #camera {
+    width: 100%;
+    height: auto;
+  }
+
+  #snapshot-preview img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  #marquee img {
+    width: 50px; /* smaller images for mobile */
+    margin-right: 5px;
+  }
+}
 
 /* FILE INPUT */
 #file-input { display: none; }
