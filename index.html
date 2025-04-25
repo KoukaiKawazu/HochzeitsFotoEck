@@ -54,7 +54,13 @@
     const app = document.getElementById('app');
     const PW_KEY = 'wedding_pw_ok';
     const CORRECT_PW = 'test123'; // change this
-
+	  
+document.addEventListener('DOMContentLoaded', function () {
+  checkAuth(); // Check authorization status
+  initCamera(); // Ensure camera starts if needed
+  fetchLatestImages(); // Fetch and display images
+});
+	  
 function checkAuth() {
   // Make sure to check sessionStorage when the page loads
   if (sessionStorage.getItem(PW_KEY) === '1') {
