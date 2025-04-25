@@ -212,10 +212,10 @@ video, canvas {
 
 
 #snapshot-preview img {
-  width: 100%; /* Ensures the image is responsive and scales within its container */
+  width: 80%; /* Ensures the image is responsive and scales within its container */
   height: auto; /* Maintains the aspect ratio of the image */
-  max-width: 100%; /* Ensures the image doesn't overflow */
-  max-height: 100%; /* Ensures the image doesn't overflow vertically */
+  max-width: 80%; /* Ensures the image doesn't overflow */
+  max-height: 80%; /* Ensures the image doesn't overflow vertically */
   border-radius: 12px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
   transition: transform 0.2s ease-out;
